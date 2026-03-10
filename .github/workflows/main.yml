@@ -1,0 +1,36 @@
+name: Build Windows EXE
+
+# ทำงานเมื่อมีการ Push โค้ดไปยัง branch 'main'
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    # สั่งให้รันบนเครื่องเซิร์ฟเวอร์ Windows
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' # เปลี่ยนเป็นเวอร์ชัน Python ที่คุณใช้งาน
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        # pip install -r requirements.txt # เอาคอมเมนต์ออกถ้ามีไฟล์ requirements.txt
+
+    - name: Build EXE with PyInstaller
+      # เปลี่ยน main.py เป็นชื่อไฟล์หลักของโปรแกรมคุณ
+      run: pyinstaller --onefile main.py 
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-executable
+        path: dist/*.exe # อัปโหลดไฟล์ .exe ที่สร้างเสร็จแล้วเพื่อให้คุณดาวน์โหลด
